@@ -1,0 +1,37 @@
+version: '3'
+services:
+  freqtrade:
+    image: freqtradeorg/freqtrade:stable
+    restart: unless-stopped
+    container_name: freqtrade
+    networks:
+      app_net:
+        ipv4_address: 172.18.0.20
+    volumes:
+      - "./user_data:/freqtrade/user_data"
+    depends_on:
+      - "updater"
+    ports:
+      - "8080:8080"
+    command: >
+      trade
+      --logfile /freqtrade/user_data/logs/freqtrade.log
+      --db-url sqlite:////freqtrade/user_data/tradesv3.sqlite
+      --config /freqtrade/user_data/config.json
+      --strategy NostalgiaForInfinityX
+  updater:
+    build:
+      context: ./
+    restart: on-failure
+    networks:
+      app_net:
+        ipv4_address: 172.18.0.21
+    container_name: strategy_updater
+    volumes:
+      - "./user_data:/user_data"
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.18.0.0/16"

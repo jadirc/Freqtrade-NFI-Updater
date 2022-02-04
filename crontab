@@ -1,0 +1,2 @@
+@reboot python /initial_run.py
+0 4 * * * python /strategy_updater.py
